@@ -20,9 +20,9 @@ public class Projectile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float acceleration = 1f;
-        float maxSpeed = 2f;
-        
+        float acceleration = GameController.instance.missileSpeed / 2f;
+        float maxSpeed = GameController.instance.missileSpeed;
+
         ChooseNearestTarget();
         if(target != null) {
             Vector2 directionToTarget = target.position - transform.position;
@@ -46,6 +46,8 @@ public class Projectile : MonoBehaviour
             Quaternion.identity
         );
         Destroy(explosion, 0.25f);
+
+        GameController.instance.EarnPoints(10);
     }
 
     void ChooseNearestTarget() {
