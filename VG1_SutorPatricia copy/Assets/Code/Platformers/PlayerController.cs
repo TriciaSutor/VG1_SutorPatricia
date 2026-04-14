@@ -1,22 +1,30 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 
 namespace Platformer {  
     public class PlayerController : MonoBehaviour
     {
+        public static PlayerController instance;
         //Outlet
         Rigidbody2D _rb;
         public Transform aimPivot;
         public GameObject projectilePrefab;
         SpriteRenderer sprite;
         Animator animator;
+        public TMP_Text scoreUI;
 
         //State Tracking
         public int jumpsLeft;
+        public int score;
+        public bool isPaused;
 
         //Methods
+
+        void Awake() {
+            instance = this;
+        }
 
         // Start is called before the first frame update
         void Start()
@@ -24,6 +32,8 @@ namespace Platformer {
             _rb = GetComponent<Rigidbody2D>();
             sprite = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
+
+            score = PlayerPrefs.GetInt("Score");
         }
 
         void FixedUpdate() {
@@ -39,12 +49,17 @@ namespace Platformer {
         // Update is called once per frame
         void Update()
         {
+            // Update Score UI
+            scoreUI.text = score.ToString();
+
+            if (isPaused) return;
+
             // Move Player Left
             if (Input.GetKey(KeyCode.A))
             {
                 _rb.AddForce(Vector2.left * 18f * Time.deltaTime, ForceMode2D.Impulse);
                 sprite.flipX = true;
-            }
+            } 
 
             // Move Player Right
             if (Input.GetKey(KeyCode.D))
@@ -52,6 +67,10 @@ namespace Platformer {
                 _rb.AddForce(Vector2.right * 18f * Time.deltaTime, ForceMode2D.Impulse);
                 sprite.flipX = false;
             }
+
+            if(Input.GetKeyDown(KeyCode.Escape)) {
+                MenuController.instance.Show();
+            }  
 
             Vector3 mousePosition = Input.mousePosition;
             Vector3 mousePositionInWorld = Camera.main.ScreenToWorldPoint(mousePosition);
@@ -96,5 +115,10 @@ namespace Platformer {
                     }
                 }
             }
+
+        public void ResetScore() {
+            score = 0;
+            PlayerPrefs.DeleteKey("Score");
+        }
     }
 }
